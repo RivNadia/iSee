@@ -82,20 +82,6 @@ struct ARViewContainer: UIViewRepresentable{
         worldConfiguration.planeDetection = [.horizontal, .vertical]
         sesion.run(worldConfiguration)
         
-        //Función para detectar tipo de planos
-        /*func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor){
-            guard let planeAnchor = anchor as? ARPlaneAnchor
-                else { return }
-                if planeAnchor.alignment == .horizontal {
-                    debugPrint("Horizontal")
-                } else if planeAnchor.alignment == .vertical {
-                    debugPrint("Vertical")
-                }
-        }
-        
-        let superficieAnchor = AnchorEntity(plane: .vertical, classification: [.wall, .table], minimumBounds: [1.0, 1.0])
-        arVista.scene.anchors.append(superficieAnchor)*/
-        
        //Se agrega la variable para priorizar el plano horizontal
        let coachingOverlay = ARCoachingOverlayView()
        coachingOverlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -145,7 +131,7 @@ struct ARViewContainer: UIViewRepresentable{
         debugPrint("Aquí tenemos los anchors", anchors)
         
         self.focusEntity = FocusEntity(on: view, style: .colored(onColor: .color(.green), offColor: .color(.blue), nonTrackingColor: .color(.red)))
-        if(focusEntity.onPlane){
+        if(focusEntity.onPlane == (ARMeshClassification(rawValue: 0) != nil)){
             playSound()
         }
     }
@@ -154,19 +140,7 @@ struct ARViewContainer: UIViewRepresentable{
 
 struct ContentView: View {
     var body: some View{
-        ZStack {
-            ARViewContainer().ignoresSafeArea()
-            Button{
-                let utterance = AVSpeechUtterance(string: "En la rotonda, gira a la derecha")
-                utterance.voice = AVSpeechSynthesisVoice(language: "es-MX")
-                utterance.rate = 0.5
-
-                let synthesizer = AVSpeechSynthesizer()
-                synthesizer.speak(utterance)
-            } label: {
-                Text("Reproducción")
-            }
-        }
+        ARViewContainer().ignoresSafeArea()
     }
 }
 
