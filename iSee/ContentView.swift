@@ -27,6 +27,15 @@ func playSound(){
     }
 }
 
+func movimiento(){
+    let utterance = AVSpeechUtterance(string: "Gira a la izquierda")
+    utterance.voice = AVSpeechSynthesisVoice(language: "es-MX")
+    utterance.rate = 0.1
+
+    let synthesizer = AVSpeechSynthesizer()
+    synthesizer.speak(utterance)
+}
+
 extension ARMeshClassification {
     
     //Para poder acompletar lo de la línea 36
@@ -132,7 +141,7 @@ struct ARViewContainer: UIViewRepresentable{
         
         self.focusEntity = FocusEntity(on: view, style: .colored(onColor: .color(.green), offColor: .color(.blue), nonTrackingColor: .color(.red)))
         if(focusEntity.onPlane == (ARMeshClassification(rawValue: 0) != nil)){
-            playSound()
+            movimiento()
         }
     }
    }
