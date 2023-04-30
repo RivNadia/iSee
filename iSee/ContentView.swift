@@ -13,6 +13,7 @@ import AVFoundation
 
 var player : AVAudioPlayer!
 
+//Función para reproducir sonido local
 func playSound(){
     let url = Bundle.main.url(forResource: "pruebas", withExtension: "mp3")
     
@@ -27,21 +28,11 @@ func playSound(){
 }
 
 extension ARMeshClassification {
-    func playSound(){
-        let url = Bundle.main.url(forResource: "pruebas", withExtension: "mp3")
-        
-        guard url != nil else { return }
-        
-        do{
-            player = try AVAudioPlayer(contentsOf: url!)
-            player?.play()
-        } catch {
-            print("Eror")
-        }
-    }
     
+    //Para poder acompletar lo de la línea 36
     func vacio(){}
     
+    //definimos comportamiento, para cada caso
     var description: Void {
         switch self {
         case .door: return playSound()
@@ -73,6 +64,7 @@ extension ARMeshClassification {
     }
 }
 
+//Estructura encargada del funcionamiento de ARKit
 struct ARViewContainer: UIViewRepresentable{
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -81,36 +73,37 @@ struct ARViewContainer: UIViewRepresentable{
     func makeUIView(context: Context) -> ARView{
         let arVista = ARView(frame: .zero)
         let texto = AnchorEntity()
-        texto.addChild(GenerarTexto(textito: "Puto el que lo lea"))
+        texto.addChild(GenerarTexto(textito: "Texto prueba"))
         arVista.scene.addAnchor(texto)
         
-        // Start AR session
+        // Inicia la sesión de AR
         let sesion = arVista.session
         let worldConfiguration = ARWorldTrackingConfiguration()
         worldConfiguration.planeDetection = [.horizontal, .vertical]
         sesion.run(worldConfiguration)
         
-        func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor){
+        //Función para detectar tipo de planos
+        /*func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor){
             guard let planeAnchor = anchor as? ARPlaneAnchor
                 else { return }
                 if planeAnchor.alignment == .horizontal {
-                    print("Horizontal")
+                    debugPrint("Horizontal")
                 } else if planeAnchor.alignment == .vertical {
-                    print("Vertical")
+                    debugPrint("Vertical")
                 }
         }
         
         let superficieAnchor = AnchorEntity(plane: .vertical, classification: [.wall, .table], minimumBounds: [1.0, 1.0])
-        arVista.scene.anchors.append(superficieAnchor)
+        arVista.scene.anchors.append(superficieAnchor)*/
         
-        // Add coaching overlay
+       //Se agrega la variable para priorizar el plano horizontal
        let coachingOverlay = ARCoachingOverlayView()
        coachingOverlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
        coachingOverlay.session = sesion
        coachingOverlay.goal = .horizontalPlane
        arVista.addSubview(coachingOverlay)
         
-        // Set debug options
+        // Opciones para el Debug
        #if DEBUG
        arVista.debugOptions = [.showFeaturePoints, .showAnchorOrigins, .showAnchorGeometry]
        #endif
@@ -121,6 +114,7 @@ struct ARViewContainer: UIViewRepresentable{
         return arVista
     }
     
+    //Función encargada de generar el estilo del texto
     func GenerarTexto(textito: String) -> ModelEntity{
         let materialVar = SimpleMaterial(color: .red, roughness: 0, isMetallic: false)
         let depthVar : Float = 0.001
@@ -140,10 +134,12 @@ struct ARViewContainer: UIViewRepresentable{
          
     }
     
+    //Clase para enfoque
     class Coordinator: NSObject, ARSessionDelegate {
     weak var view: ARView?
     var focusEntity: FocusEntity!
 
+        //Función para el enfoque de la cámara
     func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
         guard let view = self.view else { return }
         debugPrint("Aquí tenemos los anchors", anchors)
