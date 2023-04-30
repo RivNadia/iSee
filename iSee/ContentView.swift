@@ -13,6 +13,19 @@ import AVFoundation
 
 var player : AVAudioPlayer!
 
+func playSound(){
+    let url = Bundle.main.url(forResource: "pruebas", withExtension: "mp3")
+    
+    guard url != nil else { return }
+    
+    do{
+        player = try AVAudioPlayer(contentsOf: url!)
+        player?.play()
+    } catch {
+        print("Eror")
+    }
+}
+
 extension ARMeshClassification {
     func playSound(){
         let url = Bundle.main.url(forResource: "pruebas", withExtension: "mp3")
@@ -129,21 +142,35 @@ struct ARViewContainer: UIViewRepresentable{
     
     class Coordinator: NSObject, ARSessionDelegate {
     weak var view: ARView?
-    var focusEntity: FocusEntity?
+    var focusEntity: FocusEntity!
 
     func session(_ session: ARSession, didAdd anchors: [ARAnchor]) {
         guard let view = self.view else { return }
         debugPrint("Aquí tenemos los anchors", anchors)
         
         self.focusEntity = FocusEntity(on: view, style: .colored(onColor: .color(.green), offColor: .color(.blue), nonTrackingColor: .color(.red)))
+        if(focusEntity.onPlane){
+            playSound()
         }
-        
+    }
    }
 }
 
 struct ContentView: View {
     var body: some View{
-        ARViewContainer().ignoresSafeArea()
+        ZStack {
+            ARViewContainer().ignoresSafeArea()
+            Button{
+                let utterance = AVSpeechUtterance(string: "En la rotonda, gira a la derecha")
+                utterance.voice = AVSpeechSynthesisVoice(language: "es-MX")
+                utterance.rate = 0.5
+
+                let synthesizer = AVSpeechSynthesizer()
+                synthesizer.speak(utterance)
+            } label: {
+                Text("Reproducción")
+            }
+        }
     }
 }
 
