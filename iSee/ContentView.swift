@@ -27,9 +27,7 @@ extension ARMeshClassification {
         }
     }
     
-    func vacio(){
-        print("puto")
-    }
+    func vacio(){}
     
     var description: Void {
         switch self {
@@ -68,20 +66,18 @@ struct ARViewContainer: UIViewRepresentable{
     }
     
     func makeUIView(context: Context) -> ARView{
-        let arView = ARView(frame: .zero)
-        let textAnchor = AnchorEntity()
-        textAnchor.addChild(textGen(textString: "Puto el que lo lea"))
-        arView.scene.addAnchor(textAnchor)
+        let arVista = ARView(frame: .zero)
+        let texto = AnchorEntity()
+        texto.addChild(GenerarTexto(textito: "Puto el que lo lea"))
+        arVista.scene.addAnchor(texto)
         
         // Start AR session
-        let session = arView.session
-        let config = ARWorldTrackingConfiguration()
-        config.planeDetection = [.horizontal, .vertical]
-        session.run(config)
+        let sesion = arVista.session
+        let worldConfiguration = ARWorldTrackingConfiguration()
+        worldConfiguration.planeDetection = [.horizontal, .vertical]
+        sesion.run(worldConfiguration)
         
-        func renderer(_ renderer: SCNSceneRenderer,
-                      didAdd node: SCNNode,
-                       for anchor: ARAnchor){
+        func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor){
             guard let planeAnchor = anchor as? ARPlaneAnchor
                 else { return }
                 if planeAnchor.alignment == .horizontal {
@@ -91,33 +87,28 @@ struct ARViewContainer: UIViewRepresentable{
                 }
         }
         
-        let planeAnchor = AnchorEntity(plane: .vertical, classification: [.wall, .table], minimumBounds: [1.0, 1.0])
-        arView.scene.anchors.append(planeAnchor)
+        let superficieAnchor = AnchorEntity(plane: .vertical, classification: [.wall, .table], minimumBounds: [1.0, 1.0])
+        arVista.scene.anchors.append(superficieAnchor)
         
         // Add coaching overlay
        let coachingOverlay = ARCoachingOverlayView()
        coachingOverlay.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-       coachingOverlay.session = session
+       coachingOverlay.session = sesion
        coachingOverlay.goal = .horizontalPlane
-       arView.addSubview(coachingOverlay)
+       arVista.addSubview(coachingOverlay)
         
         // Set debug options
        #if DEBUG
-       arView.debugOptions = [.showFeaturePoints, .showAnchorOrigins, .showAnchorGeometry]
+       arVista.debugOptions = [.showFeaturePoints, .showAnchorOrigins, .showAnchorGeometry]
        #endif
         
-        context.coordinator.view = arView
-        session.delegate = context.coordinator
+        context.coordinator.view = arVista
+        sesion.delegate = context.coordinator
         
-        arView.addGestureRecognizer(
-            UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap)
-            )
-        )
-        
-        return arView
+        return arVista
     }
     
-    func textGen(textString: String) -> ModelEntity{
+    func GenerarTexto(textito: String) -> ModelEntity{
         let materialVar = SimpleMaterial(color: .red, roughness: 0, isMetallic: false)
         let depthVar : Float = 0.001
         let fontVar = UIFont.systemFont(ofSize: 0.05)
@@ -125,11 +116,11 @@ struct ARViewContainer: UIViewRepresentable{
         let alignmentVar : CTTextAlignment = .center
         let lineBreakModeVar : CTLineBreakMode = .byWordWrapping
         
-        let textMeshResource : MeshResource = .generateText(textString, extrusionDepth: depthVar, font: fontVar, containerFrame: containerFrameVar, alignment: alignmentVar, lineBreakMode: lineBreakModeVar)
+        let textMeshResource : MeshResource = .generateText(textito, extrusionDepth: depthVar, font: fontVar, containerFrame: containerFrameVar, alignment: alignmentVar, lineBreakMode: lineBreakModeVar)
         
-        let textEntity = ModelEntity(mesh: textMeshResource, materials: [materialVar])
+        let textoEntidad = ModelEntity(mesh: textMeshResource, materials: [materialVar])
         
-        return textEntity
+        return textoEntidad
     }
     
     func updateUIView(_ uiView: ARView, context: Context) {
@@ -144,22 +135,9 @@ struct ARViewContainer: UIViewRepresentable{
         guard let view = self.view else { return }
         debugPrint("Aquí tenemos los anchors", anchors)
         
-        self.focusEntity = FocusEntity(on: view, style: .classic(color: .red))
+        self.focusEntity = FocusEntity(on: view, style: .colored(onColor: .color(.green), offColor: .color(.blue), nonTrackingColor: .color(.red)))
         }
         
-        @objc func handleTap(){
-            /*guard let view = self.view, let focusEntity = self.focusEntity else { return}
-            
-            let anchor = AnchorEntity()
-            view.scene.anchors.append(anchor)
-            
-            let box = MeshResource.generateBox(size: 0.5, cornerRadius: 0.05)
-            let material = SimpleMaterial(color: .blue, isMetallic: true)
-            let diceEntity = ModelEntity(mesh: box, materials: [material])
-            diceEntity.position = focusEntity.position
-
-            anchor.addChild(diceEntity)*/
-        }
    }
 }
 
