@@ -13,6 +13,7 @@ import AVFoundation
 
 var player : AVAudioPlayer!
 
+
 //Función para reproducir sonido local
 func playSound(){
     let url = Bundle.main.url(forResource: "pruebas", withExtension: "mp3")
@@ -149,7 +150,9 @@ struct ARViewContainer: UIViewRepresentable{
 
 struct ContentView: View {
     var body: some View{
-        ARViewContainer().ignoresSafeArea()
+        ZStack{
+            ARViewContainer().ignoresSafeArea()
+        }
     }
 }
 
